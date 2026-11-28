@@ -1,0 +1,21 @@
+{
+  "version": "dice-2.0-c4b1f70e",
+  "appSha256": "a8b87a23218a7ab3afdd09c1e211e201ee69d90b5f25fbdc2118e0b822526a0b",
+  "releaseFiles": [
+    "web/app.js",
+    "web/styles.css",
+    "gas/public/PublicApi.gs",
+    "gas/public/DiceRules.gs",
+    "gas/admin/TestCore.gs",
+    "gas/admin/TestApi.gs",
+    "gas/admin/TestMaster.gs",
+    "gas/admin/TestAdmin.gs",
+    "gas/admin/TestRunner.html",
+    "tools/build_staff_game.py"
+  ],
+  "differences": [
+    "transport adapter",
+    "test-only footer",
+    "scheduled polling disabled"
+  ]
+}

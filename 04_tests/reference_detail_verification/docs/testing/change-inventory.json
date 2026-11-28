@@ -1,0 +1,146 @@
+{
+  "baseline": "スタッフ検証追加版v1.2",
+  "release": "試行回数版v2.0",
+  "files": [
+    {
+      "path": "スタッフ検証_はじめに.md",
+      "change": "modified",
+      "sha256": "376363fae4292bcee3b0f3e1f01ccaa07a181d862aa728b31fb588929bf5f496"
+    },
+    {
+      "path": "package.json",
+      "change": "modified",
+      "sha256": "689fd01c394d82701e9ea1e2a4cf9eb2586497c2bd5b4fe2646e1fed4b13e52b"
+    },
+    {
+      "path": "README.md",
+      "change": "modified",
+      "sha256": "dc7c05018a30abdb1c2deec038c366b9e359957a776fd1e50aabc9b4d868c3ee"
+    },
+    {
+      "path": "tools/build_staff_game.py",
+      "change": "modified",
+      "sha256": "73267a9671fc645bc8b3181ad50aeda92f1fc107ffba96c45bf9d9b1a660b6cb"
+    },
+    {
+      "path": "web/app.js",
+      "change": "modified",
+      "sha256": "a8b87a23218a7ab3afdd09c1e211e201ee69d90b5f25fbdc2118e0b822526a0b"
+    },
+    {
+      "path": "tests/backend.test.cjs",
+      "change": "modified",
+      "sha256": "8b71664fdf29144ed1f634f4757d109da7cb1200d6356c3c59f9da21dbe70667"
+    },
+    {
+      "path": "tests/staff-ui.test.cjs",
+      "change": "modified",
+      "sha256": "431bca18818503fdd98c0466119bddbc071bbd6abab78359f074c1d5dc9b6f35"
+    },
+    {
+      "path": "tests/staff-testing.test.cjs",
+      "change": "modified",
+      "sha256": "50f52703e6c22f239426d846ba161e2c2652de4f78c9d090c45e91b0aab55634"
+    },
+    {
+      "path": "docs/06-検証結果.md",
+      "change": "modified",
+      "sha256": "e09c8e6fe19caa1b1d76f5f69c9819986c21a3a563aab9a590db3ef2d41d9a84"
+    },
+    {
+      "path": "docs/02-導入公開手順.md",
+      "change": "modified",
+      "sha256": "a56d3b477815e97384a4792029a11da6ea32db76598c1435f304a1f7f9637a34"
+    },
+    {
+      "path": "docs/testing/02-セットアップ手順.md",
+      "change": "modified",
+      "sha256": "acfcbe16cbb58d12afec6946aff70dd859faf5e4580e01baa22d4b389f3d8360"
+    },
+    {
+      "path": "docs/testing/01-設計と既存への影響.md",
+      "change": "modified",
+      "sha256": "611bb5476e4919e55d3dd4653e836161b775b52879662e06ea320d5ef5d0c706"
+    },
+    {
+      "path": "docs/testing/03-スタッフ簡易操作説明.md",
+      "change": "modified",
+      "sha256": "59e219bfc8cd3eb3f62779bf6e3eecc994818677c4e08482ea387dd658b989d5"
+    },
+    {
+      "path": "docs/testing/06-CSV分析依頼テンプレート.md",
+      "change": "modified",
+      "sha256": "410594f968f9de3b4cfeca044f2827f0fee021c85313b8b90e9c17c97bc5003c"
+    },
+    {
+      "path": "docs/testing/game-source.json",
+      "change": "modified",
+      "sha256": "493516bceb12e510eb1c08873fd980724f83a4d4f29460cf578169db809a88e9"
+    },
+    {
+      "path": "docs/testing/07-変更点一覧.md",
+      "change": "added",
+      "sha256": "a1fdfbb814ad4ee546a4c67c93240486c92275d32911a833f2db483fa969729b"
+    },
+    {
+      "path": "docs/testing/local-test-results.txt",
+      "change": "added",
+      "sha256": "2edd4bf2f80234b9025eb47f8c3d756f84d4ce6d2fe3813b3b7496ba326be950"
+    },
+    {
+      "path": "docs/testing/05-検証結果と実環境チェック.md",
+      "change": "modified",
+      "sha256": "f8dabc3d25510c85b59456cf6cda4fad6a22a4e123d11d7488b1c81699606dcc"
+    },
+    {
+      "path": "docs/testing/04-管理者運用とDB仕様.md",
+      "change": "modified",
+      "sha256": "32656d97bc2ad4eb8a8798b5e587cac044120250cb02b0325a291a88f2745430"
+    },
+    {
+      "path": "gas/public/PublicApi.gs",
+      "change": "modified",
+      "sha256": "829d7cd3a05a2458d7a17ac82d402a9e5053314a2d9f171bfd557098caf4aeab"
+    },
+    {
+      "path": "gas/public/DiceRules.gs",
+      "change": "added",
+      "sha256": "ae6ec08f5a88d411b45f11af9e11e58bda62222aee0d0c9aa3dc5208575bc940"
+    },
+    {
+      "path": "gas/admin/Admin.gs",
+      "change": "modified",
+      "sha256": "bbd60318d74dffa8a643a035d1cf6f3a82f49ea9277127bfaa25f68b497d78dd"
+    },
+    {
+      "path": "gas/admin/TestApi.gs",
+      "change": "modified",
+      "sha256": "a9a6d2ed2ef64001de5a4adb3fa31fe1e1878fde3434b698ecbdb58497f027f6"
+    },
+    {
+      "path": "gas/admin/TestCore.gs",
+      "change": "modified",
+      "sha256": "bf21444b2cb58c9454fe706362ed1232a91d53ea9fa291adc03cb2058da69275"
+    },
+    {
+      "path": "gas/admin/TestRunner.html",
+      "change": "modified",
+      "sha256": "ca6a1d54e9a1d25b372c41a862468f38c5a3589a9c4baf2f98d383721e8c4b08"
+    },
+    {
+      "path": "gas/admin/TestMaster.gs",
+      "change": "modified",
+      "sha256": "89b2e670d5f43f57e168f6181205bf7518754d389d29b002bcc12d5cc53068a8"
+    },
+    {
+      "path": "gas/admin/TestAdmin.gs",
+      "change": "modified",
+      "sha256": "358aadf134a09a6b20c0a44fb66f59bcfcee213378a71a97f8a6de801e615f15"
+    },
+    {
+      "path": "gas/admin/DiceRules.gs",
+      "change": "added",
+      "sha256": "ae6ec08f5a88d411b45f11af9e11e58bda62222aee0d0c9aa3dc5208575bc940"
+    }
+  ]
+}
