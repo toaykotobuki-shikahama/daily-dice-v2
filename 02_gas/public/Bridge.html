@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta name="referrer" content="no-referrer"><meta charset="utf-8"></head><body><script>
+'use strict';const ORIGIN=<?!= originJson ?>,NONCE=<?!= nonceJson ?>;
+window.addEventListener('message',event=>{if(event.origin!==ORIGIN||event.source!==window.top)return;const m=event.data;if(!m||m.kind!=='dice-request'||m.nonce!==NONCE||!/^[a-f0-9]{32}$/.test(m.id))return;const reply=result=>window.top.postMessage({kind:'dice-response',nonce:NONCE,id:m.id,result},ORIGIN);google.script.run.withSuccessHandler(reply).withFailureHandler(()=>reply({ok:false,error:'TRANSPORT_ERROR'})).v2PublicRpc(m.request);});
+window.top.postMessage({kind:'dice-ready',nonce:NONCE},ORIGIN);
+</script></body></html>

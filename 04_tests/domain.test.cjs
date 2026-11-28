@@ -1,0 +1,14 @@
+const vm=require('node:vm'),fs=require('fs'),assert=require('assert');
+const sandbox={Utilities:{formatDate:(d,tz,fmt)=>{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);const o=Object.fromEntries(parts.map(x=>[x.type,x.value]));return `${o.year}-${o.month}-${o.day}`;}}};
+vm.runInNewContext(fs.readFileSync(__dirname+'/../02_gas/public/Domain.js','utf8'),sandbox); const D=sandbox.DiceV2;
+let passed=0;function test(name,fn){fn();passed++;console.log('PASS '+name)}
+const base={id:'DICE-TEST',name:'検証',startDate:'2026-12-01',endDate:'2026-12-14',receptionEndDate:'2026-12-16',target:7,points:[1,1,1,2,2,3],confirmationEnabled:true,paused:false};
+test('valid campaign and bounded integer rules',()=>{assert.equal(D.validateCampaign(base).target,7);assert.throws(()=>D.validateCampaign({...base,points:[1,1,1,0,2,3]}),e=>e.code==='INVALID_POINTS');});
+test('reject invalid date and ordering',()=>{assert.throws(()=>D.validateCampaign({...base,startDate:'2026-02-30'}),e=>e.code==='INVALID_DATE');assert.throws(()=>D.validateCampaign({...base,endDate:'2026-11-30'}),e=>e.code==='INVALID_DATE_ORDER');});
+test('reject inclusive overlap; allow next day',()=>{assert.throws(()=>D.validateNoOverlap([base],{...base,id:'X',startDate:'2026-12-14',endDate:'2026-12-20'}),e=>e.code==='CAMPAIGN_OVERLAP');D.validateNoOverlap([base],{...base,id:'X',startDate:'2026-12-15',endDate:'2026-12-20'});});
+test('JST inclusive date boundary',()=>{assert.equal(D.campaignState(base,Date.parse('2026-11-30T14:59:59Z')).status,'UPCOMING');assert.equal(D.campaignState(base,Date.parse('2026-11-30T15:00:00Z')).status,'ACTIVE');assert.equal(D.campaignState(base,Date.parse('2026-12-14T15:00:00Z')).status,'ENDED');});
+test('suspension is independent from reception',()=>{assert.equal(D.campaignState({...base,paused:true},Date.parse('2026-12-02T03:00:00Z')).status,'PAUSED');assert.equal(D.canReception({...base,paused:true},{state:'ACHIEVED'},true,Date.parse('2026-12-15T01:00:00Z')),true);});
+test('scoring map and campaign-scoped cards',()=>{assert.deepEqual([1,2,3,4,5,6].map(x=>D.addPoints(base,x)),[1,1,1,2,2,3]);assert.equal(D.newCard(base.id,'P').total,0);});
+test('next playable time is the following JST midnight',()=>{assert.equal(D.nextJstMidnight(Date.parse('2026-12-01T12:00:00Z')),'2026-12-01T15:00:00.000Z');});
+test('expired confirmation is renewed only inside its reception window',()=>{const card={state:'ACHIEVED',confirmationCode:'123456',confirmationExpiresAt:'2026-12-01T00:00:00.000Z'};assert.equal(D.confirmationNeedsRenewal(base,card,Date.parse('2026-12-01T00:01:00Z')),true);assert.equal(D.confirmationNeedsRenewal(base,card,Date.parse('2026-12-16T15:00:00Z')),false);assert.equal(D.confirmationCodeExpiry('2026-12-16',Date.parse('2026-12-16T14:55:00Z')),Date.parse('2026-12-16T15:00:00Z'));});
+console.log(`\n${passed} domain tests passed`);

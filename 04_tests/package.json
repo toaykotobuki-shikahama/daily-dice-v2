@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"test":"node static_check.cjs && node domain.test.cjs && node adapter.test.cjs && node --check ../03_pages/app.js && node --check ../03_pages/transport.js"}}
