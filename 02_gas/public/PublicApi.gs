@@ -46,8 +46,12 @@ function v2Authenticate_(req){
   const hash=v2Hash_(req.secret),p=v2Rows_('Participants').find(x=>String(x.participantId)===String(req.participantId)&&String(x.secretHash)===hash);
   if(!p)throw new Error('AUTH');return p;
 }
-function v2Status_(p,campaignId,active,now,trace,readOnly){
-  const all=v2Rows_('Cards').filter(x=>String(x.participantId)===String(p.participantId));
+// fresh: a card row this execution just wrote through the Sheets API. SpreadsheetApp does not see those
+// writes within the same execution, so the written row replaces the (stale) row read back here.
+function v2Status_(p,campaignId,active,now,trace,readOnly,fresh){
+  const same=x=>fresh&&String(x.campaignId)===String(fresh.campaignId)&&String(x.participantId)===String(fresh.participantId);
+  const all=v2Rows_('Cards').filter(x=>String(x.participantId)===String(p.participantId)).map(x=>same(x)?fresh:x);
+  if(fresh&&!all.includes(fresh))all.push(fresh);
   let target=campaignId?v2FindCampaign_(campaignId):active&&v2FindCampaign_(active.id);
   if(!target&&all.length)target=v2FindCampaign_(all[all.length-1].campaignId);
   const c=target?v2Campaign_(target):active;
@@ -98,5 +102,5 @@ function v2Roll_(req,p,active,now,day,trace){
     {name:'Cards',obj:card,keyFields:['campaignId','participantId']},
     {name:'ProcessLog',obj:{traceId:trace,action:'roll',stage:'DRAW_AND_CARD_COMMIT',result:'OK',reasonCode:'',eventId,storageState:'COMMITTED',createdAt:now},append:true}
   ]);
-  const result=v2Status_(p,id,active,now,trace);result.card.lastResult={eventId,face,earned,total:card.total};return result;
+  const result=v2Status_(p,id,active,now,trace,false,card);result.card.lastResult={eventId,face,earned,total:card.total};return result;
 }

@@ -40,6 +40,27 @@ class Book {
 const books = {};
 const apiValue = (cell) => { const u = cell.userEnteredValue || {}; return 'numberValue' in u ? u.numberValue : 'boolValue' in u ? u.boolValue : 'stringValue' in u ? u.stringValue : ''; };
 
+function staleSheet(sh, cache) {
+  if (!sh) return sh;
+  const drop = () => { for (const k of [...cache.keys()]) if (k.startsWith(sh.name + '|')) cache.delete(k); };
+  const memo = (k, f) => { k = sh.name + '|' + k; if (!cache.has(k)) cache.set(k, f()); return cache.get(k); };
+  return new Proxy(sh, { get(t, prop) {
+    if (prop === 'getLastRow') return () => memo('last', () => t.getLastRow());
+    if (prop === 'appendRow') return (v) => { drop(); return t.appendRow(v); };
+    if (prop === 'getRange') return (r, c, nr = 1, nc = 1) => { const real = t.getRange(r, c, nr, nc); return { ...real,
+      getValues: () => memo([r, c, nr, nc].join(','), () => real.getValues()),
+      getDisplayValues: () => real.getDisplayValues(),
+      setValues: (v) => { drop(); return real.setValues(v); }, setValue: (v) => { drop(); return real.setValue(v); } }; };
+    const v = t[prop]; return typeof v === 'function' ? v.bind(t) : v;
+  } });
+}
+function staleBook(book, cache) {
+  return new Proxy(book, { get(t, prop) {
+    if (prop === 'getSheetByName') return (n) => staleSheet(t.getSheetByName(n), cache);
+    const v = t[prop]; return typeof v === 'function' ? v.bind(t) : v;
+  } });
+}
+
 function makeEnv(props, user) {
   const counters = { lockAttempts: 0, flush: 0 }, cache = new Map();
   let lockFree = true;
@@ -56,7 +77,9 @@ function makeEnv(props, user) {
     PropertiesService: { getScriptProperties: () => ({ getProperty: k => props[k] ?? null, setProperty: (k, v) => { props[k] = v; } }) },
     LockService: { getScriptLock: () => ({ tryLock: () => { counters.lockAttempts++; if (env.__forceBusy || !lockFree) return false; lockFree = false; return true; }, releaseLock: () => { lockFree = true; } }) },
     CacheService: { getScriptCache: () => ({ get: k => cache.get(k) || null, put: (k, v) => cache.set(k, v) }) },
-    SpreadsheetApp: { openById: id => { if (!books[id]) throw new Error('no book ' + id); return books[id]; }, flush: () => { counters.flush++; } },
+    // __staleReads mimics real Apps Script: within one execution SpreadsheetApp keeps reads cached and does not
+    // see writes made through the Sheets advanced service (its own writes do invalidate the cache).
+    SpreadsheetApp: { openById: id => { if (!books[id]) throw new Error('no book ' + id); return env.__staleReads ? staleBook(books[id], env.__readCache) : books[id]; }, flush: () => { counters.flush++; } },
     Sheets: { Spreadsheets: { batchUpdate: ({ requests }, id) => {
       // All-or-nothing, like the real API: validate everything against a scratch copy first.
       const book = books[id], snapshot = book.sheets.map(s => ({ s, rows: JSON.stringify(s.rows), max: s.maxRows }));
@@ -77,7 +100,7 @@ function makeEnv(props, user) {
     HtmlService: {},
     UrlFetchApp: { fetch: () => { throw new Error('UrlFetchApp not wired'); } },
   };
-  env.__counters = counters;
+  env.__counters = counters; env.__readCache = new Map();
   return vm.createContext(env);
 }
 function load(ctx, dir, names) {
@@ -126,6 +149,15 @@ test('admin save via signed RPC, then register -> status -> roll -> achieved cod
   assert.ok(r.ok, JSON.stringify(r)); assert.equal(r.card.state, 'ACHIEVED'); assert.match(r.card.confirmationCode, /^\d{6}$/);
   const again = pub.v2Public_({ action: 'roll', ...id, campaignId: c.id, requestId: 'req-1' }); assert.ok(again.ok, 'replay of same requestId must resolve');
   assert.equal(books[DB].getSheetByName('DailyHistory').getLastRow(), 2, 'replay must not add a second draw');
+});
+
+test('roll response shows the card as written, even when SpreadsheetApp reads are stale (real GAS behaviour)', () => {
+  const { pub, adm } = setup(); const c = campaign(adm, { target: 1 }), id = participant(pub);
+  pub.__staleReads = true; pub.__readCache.clear();   // one execution = one cache
+  const r = pub.v2Public_({ action: 'roll', ...id, campaignId: c.id, requestId: 'stale-1' });
+  assert.ok(r.ok, JSON.stringify(r));
+  assert.equal(r.card.state, 'ACHIEVED', 'card state in the roll response is the pre-write value (2026-11-28 real-GAS bug)');
+  assert.equal(r.card.total, 1); assert.equal(r.card.canRoll, false); assert.match(r.card.confirmationCode, /^\d{6}$/);
 });
 
 test('rolls keep working after the 1000-row grid is full (ProcessLog / DailyHistory)', () => {
