@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+# 秘密値・実データは入れない
+.env
+*.secret
+*secret*.txt
